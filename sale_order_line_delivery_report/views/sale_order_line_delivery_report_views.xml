@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_sale_order_line_delivery_report_search" model="ir.ui.view">
+        <field name="name">sale.order.line.delivery.report.search</field>
+        <field name="model">sale.order.line.delivery.report</field>
+        <field name="arch" type="xml">
+            <search string="Delivered Sale Order Lines">
+                <field name="order_name"/>
+                <field name="customer_id"/>
+                <field name="salesperson_id"/>
+                <field name="product_id"/>
+                <field name="company_id"/>
+                <field name="state"/>
+                <field name="order_date"/>
+
+                <filter name="filter_sale" string="Sales Orders" domain="[('state', 'in', ['sale', 'done'])]"/>
+                <filter name="filter_done" string="Locked" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="group_customer" string="Customer" context="{'group_by': 'customer_id'}"/>
+                <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                <filter name="group_salesperson" string="Salesperson" context="{'group_by': 'salesperson_id'}"/>
+                <filter name="group_order" string="Sales Order" context="{'group_by': 'order_id'}"/>
+                <filter name="group_order_date" string="Order Date" context="{'group_by': 'order_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sale_order_line_delivery_report_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.delivery.report.tree</field>
+        <field name="model">sale.order.line.delivery.report</field>
+        <field name="arch" type="xml">
+            <tree string="Delivered Sale Order Lines" create="0" edit="0" delete="0">
+                <field name="order_date"/>
+                <field name="order_name"/>
+                <field name="customer_id"/>
+                <field name="salesperson_id"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty" sum="Total Ordered"/>
+                <field name="qty_delivered" sum="Total Delivered"/>
+                <field name="product_uom"/>
+                <field name="price_unit"/>
+                <field name="price_subtotal" sum="Total Subtotal"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sale_order_line_delivery_report_form" model="ir.ui.view">
+        <field name="name">sale.order.line.delivery.report.form</field>
+        <field name="model">sale.order.line.delivery.report</field>
+        <field name="arch" type="xml">
+            <form string="Delivered Sale Order Line" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="order_name"/>
+                            <field name="order_date"/>
+                            <field name="customer_id"/>
+                            <field name="salesperson_id"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="order_line_id"/>
+                            <field name="product_id"/>
+                            <field name="product_template_id"/>
+                            <field name="product_uom_qty"/>
+                            <field name="qty_delivered"/>
+                            <field name="product_uom"/>
+                            <field name="price_unit"/>
+                            <field name="price_subtotal"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_delivery_report" model="ir.actions.act_window">
+        <field name="name">Delivered Order Lines</field>
+        <field name="res_model">sale.order.line.delivery.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sale_order_line_delivery_report_search"/>
+        <field name="context">{'search_default_filter_sale': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Delivered sale order lines
+            </p>
+            <p>
+                This report shows only sales order lines with delivered quantity greater than zero.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_sale_order_line_delivery_report_root"
+        name="Delivery Reports"
+        parent="sale.sale_menu_root"
+        sequence="95"
+        groups="sales_team.group_sale_salesman"/>
+
+    <menuitem
+        id="menu_sale_order_line_delivery_report"
+        name="Delivered Order Lines"
+        parent="menu_sale_order_line_delivery_report_root"
+        action="action_sale_order_line_delivery_report"
+        sequence="10"
+        groups="sales_team.group_sale_salesman"/>
+</odoo>
