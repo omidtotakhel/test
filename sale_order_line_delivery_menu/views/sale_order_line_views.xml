@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_line_delivery_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.delivery.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <list string="Sale Order Lines To Deliver" create="false" edit="false" delete="false">
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty"/>
+                <field name="qty_delivered"/>
+                <field name="qty_to_deliver"/>
+                <field name="product_uom"/>
+                <field name="state"/>
+                <field name="commitment_date" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sale_order_line_delivery_search" model="ir.ui.view">
+        <field name="name">sale.order.line.delivery.search</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <search string="Sale Order Lines To Deliver">
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="product_id"/>
+                <field name="state"/>
+                <filter name="filter_to_deliver" string="To Deliver" domain="[('qty_to_deliver', '&gt;', 0)]"/>
+                <filter name="filter_sale" string="Sales Orders" domain="[('state', 'in', ('sale', 'done'))]"/>
+                <filter name="filter_stockable" string="Storable Products" domain="[('product_id.type', '=', 'consu')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_order" string="Order" context="{'group_by': 'order_id'}"/>
+                    <filter name="group_customer" string="Customer" context="{'group_by': 'order_partner_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_to_deliver" model="ir.actions.act_window">
+        <field name="name">Products To Deliver</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_sale_order_line_delivery_tree"/>
+        <field name="search_view_id" ref="view_sale_order_line_delivery_search"/>
+        <field name="domain">[
+            ('display_type', '=', False),
+            ('state', 'in', ('sale', 'done')),
+            ('product_id', '!=', False),
+            ('qty_to_deliver', '&gt;', 0)
+        ]</field>
+        <field name="context">{'search_default_filter_to_deliver': 1, 'search_default_filter_sale': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No sales order lines to deliver
+            </p>
+            <p>
+                This view shows confirmed sales order lines with remaining quantities to deliver.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_sale_order_line_to_deliver"
+        name="Products To Deliver"
+        parent="sale.sale_order_menu"
+        action="action_sale_order_line_to_deliver"
+        sequence="35"
+        groups="sales_team.group_sale_salesman"/>
+
+</odoo>
